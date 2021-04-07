@@ -1,89 +1,112 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-    content="width=device-width,
-       initial-scale=1.0">
-  <title>Sesión</title>
-  <!--
-    Carga el núcleo de Firebase
-    JS SDK
-  -->
-  <script
-    src="https://www.gstatic.com/firebasejs/8.2.3/firebase-app.js">
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chat</title>
+    <link rel="stylesheet" href="estilos.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+   
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js">
     </script>
-  <!--
-    Agrega el manejo de
-    autenticación.
-  -->
-  <script
-    src="https://www.gstatic.com/firebasejs/8.2.3/firebase-auth.js">
+    <script
+    src="https://www.gstatic.com/firebasejs/8.3.1/firebase-firestore.js">
     </script>
-  <!--
-    Agrega el manejo de bases de
-    datos.
-  -->
-  <script
-    src="https://www.gstatic.com/firebasejs/8.2.3/firebase-firestore.js">
+    <script src="js/init.js"></script>
+    
+  </head>
+  <body>
+    <h1>Chat</h1>
+    <form action="javascript:agrega();">
+      <input id="texto" type="text" required placeholder="Mensaje">
+      <button>Enviar</button>
+    </form>
+    <ol id="mensajes"><li><progress max="100">Cargando…</progress></li></ol>
+    <script>
+     
+      let usuario = "";
+      
+      const auth = firebase.auth();
+      
+      const provider = new firebase.auth.GoogleAuthProvider();
+      
+      provider.setCustomParameters({ prompt: "select_account" });
+     
+      auth.onAuthStateChanged(
+      
+        async usuarioAuth => {
+          if (usuarioAuth && usuarioAuth.email) {
+          
+            usuario = usuarioAuth.email;
+            
+            muestraMensajes();
+          } else {
+           
+            await auth.signInWithRedirect(provider);
+          }
+        },
+        
+        procesaError
+      );
+      
+      const firestore = firebase.firestore();
+     
+      function agrega() {
+        
+        firestore.collection("MENSAJE").add({
+          USUARIO: usuario,
+          
+          TEXTO: texto.value.trim(),
+          
+          TIMESTAMP: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+      
+      function muestraMensajes() {
+       
+        firestore.collection("MENSAJE").orderBy("TIMESTAMP", "desc")
+          .onSnapshot(
+            
+            querySnapshot => {
+              
+              mensajes.innerHTML = "";
+              
+              querySnapshot.forEach(doc => {
+              
+                const data = doc.data();
+                
+                var d = data.TIMESTAMP.toDate(),
+                dformat = [d.getDate(), d.getMonth()+1, d.getFullYear()].join('/')+' '+
+                          [d.getHours(),d.getMinutes(),d.getSeconds()].join(':');
+                
+                mensajes.innerHTML += /* html */
+                  `<li><u>${cod(data.USUARIO)}</u> ${dformat}<br>${cod(data.TEXTO)}</li>`;
+              })
+            },
+          
+            e => {
+              procesaError(e);
+              // Intenta conectarse otra vez.
+              muestraMensajes();
+            }
+          )
+      }
+
+      
+      function procesaError(e) {
+        console.log(e);
+        alert(e.message);
+      }
+
+      
+      const codMap = Object.freeze(new Map([['&', '&amp;'], ['<', '&lt;'],
+      ['>', '&gt;'], ['"', '&quot;'], ["'", '&#039;']]));
+
+    
+      function cod(texto) {
+        return (texto || "").replace(/[&<>"']/g, letra => codMap.get(letra));
+      }
     </script>
-  <!--
-    Configura la app usando la
-    información del sitio de
-    Firebase.
-  -->
-  <script src="js/init.js">
-  </script>
-  <script type="module"
-    src="cmp/mi-nav.js">
-    </script>
-  <script type="module"
-    src="cmp/mi-footer.js">
-    </script>
-  <script type="module"
-    src="cmp/mi-progreso.js">
-    </script>
-  <link rel="stylesheet"
-    href="css/estilos.css">
-</head>
-<body>
-  <form name="forma">
-    <mi-nav></mi-nav>
-    <header>
-      <h1>Sesión Iniciada</h1>
-        <button
-          type="button"
-          name="terminarSesión">
-          Terminar Sesión
-        </button>
-      </div>
-    </header>
-    <figure>
-      <img id="avatar" src=""
-        alt="Avatar">
-    </figure>
-    <p>
-      <label>
-        Email
-        <output name="email">
-          <mi-progreso>
-          </mi-progreso>
-        </output>
-      </label>
-    </p>
-    <p>
-      <label>
-        Nombre
-        <output name="nombre">
-          <mi-progreso>
-          </mi-progreso>
-        </output>
-      </label>
-    </p>
-    <mi-footer></mi-footer>
-  </form>
-  <script type="module"
-    src="js/CtrlSesion.js">
-    </script>
-</body>
+  </body>
 </html>
