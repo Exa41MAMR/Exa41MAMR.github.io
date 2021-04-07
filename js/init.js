@@ -2,11 +2,11 @@
  * configuración en tu servidor de Firebase.  */
 // @ts-ignore
 firebase.initializeApp({
-     apiKey: "AIzaSyBgh13kIfw0hy718sJw_2Zt171A-lkMJQU",
-    authDomain: "evaluar1.firebaseapp.com",
-    projectId: "evaluar1",
-    storageBucket: "evaluar1.appspot.com",
-    messagingSenderId: "1077970752948",
-    appId: "1:1077970752948:web:1b0ea98b45c23ad5f4cee1",
-    measurementId: "G-0FJSV852NS"
+       apiKey: "AIzaSyBrewxCsOHOjxBwVGgX7jfptBLMGqt8psA",
+    authDomain: "evaluacionl.firebaseapp.com",
+    projectId: "evaluacionl",
+    storageBucket: "evaluacionl.appspot.com",
+    messagingSenderId: "572276073128",
+    appId: "1:572276073128:web:47279926e1628e9d4bd89d",
+    measurementId: "G-XV7LKKFG67"
     });
